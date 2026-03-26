@@ -17,14 +17,7 @@ To get started with this game project:
    git clone https://github.com/AndraVito09/Game-Project.git
    cd Game-Project
    ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm start
-   ```
+2. Start With Live Server
 
 ## Gameplay
 - **Objective**: The main objective of the game is to [describe the objective here].
