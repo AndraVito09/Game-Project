@@ -4,6 +4,7 @@ import GameScene from "./scenes/GameScene.js";
 import CreditScene from "./scenes/CreditScene.js";
 import UIScene from "./scenes/PopUpUi.js";
 import GameOverScene from "./scenes/GameOverScene.js";
+import { SaveManager } from "./SaveManager.js";
 
 const config = {
     type: Phaser.AUTO,
@@ -13,7 +14,7 @@ const config = {
     width:      1905,                 // ← sesuai asset kamu
     height:     870,
     },
-    scene: [HomeScene, CreditScene, LevelSelectScene, GameScene, UIScene, GameOverScene]
+    scene: [HomeScene, CreditScene, LevelSelectScene, GameScene, UIScene, GameOverScene, SaveManager]
 };
 
 const game = new Phaser.Game(config);
