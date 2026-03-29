@@ -1,107 +1,123 @@
-import { SaveManager } from './SaveManager.js';
-
 export default class LevelSelectScene extends Phaser.Scene {
     constructor() {
         super('LevelSelectScene');
     }
 
-    preload() {
+    preload(){
         this.load.image('bglevel', 'assets/levelselection.png');
-        for (let i = 1; i <= 10; i++) this.load.image(`level${i}`, `assets/Level ${i}.png`);
+        this.load.image('level1', 'assets/Level 1.png');
+        this.load.image('level2', 'assets/Level 2.png');
+        this.load.image('level3', 'assets/Level 3.png');
+        this.load.image('level4', 'assets/Level 4.png');
+        this.load.image('level5', 'assets/Level 5.png');
+        this.load.image('level6', 'assets/Level 6.png');
+        this.load.image('level7', 'assets/Level 7.png');
+        this.load.image('level8', 'assets/Level 8.png');
+        this.load.image('level9', 'assets/Level 9.png');
+        this.load.image('level10', 'assets/Level 10.png');
+        this.load.image('kembali', 'assets/back.png');
     }
 
     create() {
-        const W  = this.scale.width;
-        const H  = this.scale.height;
-        const cx = W / 2;
-        const fs = (n) => `${Math.round(n * W / 800)}px`;
-
-        this.add.image(W / 2, H / 2, 'bglevel');
-        this.add.text(cx, H * 0.15, 'SELECT LEVEL', {
-            fontSize: fs(32), fontFamily: 'PixeloidSans-Bold'
+        this.add.image(1905/2, 870/2,'bglevel')
+        this.add.text(1090, 130, 'SELECT LEVEL', {
+            fontSize: '32px',
+            fontFamily: 'PixeloidSans-Bold'
         }).setOrigin(0.5);
 
-        // Layout posisi tombol level (sama seperti aslinya)
-        const positions = [
-            { x: 620,  y: 250 }, { x: 770,  y: 250 }, { x: 920,  y: 250 },
-            { x: 1070, y: 250 }, { x: 1220, y: 250 }, { x: 1370, y: 250 },
-            { x: 1520, y: 250 }, { x: 920,  y: 400 }, { x: 1070, y: 400 },
-            { x: 1220, y: 400 }
-        ];
-
-        for (let i = 1; i <= 10; i++) {
-            const pos      = positions[i - 1];
-            const unlocked = SaveManager.isUnlocked(i);
-            const stats    = SaveManager.getLevelStats(i);
-
-            // Gambar tombol level
-            const btn = this.add.image(pos.x, pos.y, `level${i}`)
-                .setScale(0.5)
-                .setDepth(1);
-
-            if (unlocked) {
-                // ── LEVEL TERBUKA ──────────────────────────────
-                btn.setInteractive();
-
-                btn.on('pointerover',  () => btn.setScale(0.6));
-                btn.on('pointerout',   () => { btn.setScale(0.5); btn.clearTint(); });
-                btn.on('pointerdown',  () => { btn.setScale(0.44); btn.setTint(0xdddddd); });
-                btn.on('pointerup',    () => {
-                    btn.setScale(0.5); btn.clearTint();
-                    this.scene.start('GameScene', { level: String(i), questionIndex: 0, score: 0, lives: 3, correctCount: 0 });
-                });
-
-                // Badge completed
-                if (stats.completed) {
-                    this.add.text(pos.x + 36, pos.y - 36, '✓', {
-                        fontFamily: 'PixeloidSans-Bold',
-                        fontSize:   fs(18),
-                        color:      '#00ff99',
-                        backgroundColor: '#003300',
-                        padding:    { x: 4, y: 2 }
-                    }).setOrigin(0.5).setDepth(3);
-                }
-
-                // Best score kecil di bawah tombol
-                if (stats.bestCorrect > 0) {
-                    this.add.text(pos.x, pos.y + 46, `${stats.bestCorrect}/5 ✓`, {
-                        fontFamily: 'PixeloidMono',
-                        fontSize:   fs(12),
-                        color:      '#aaaaff'
-                    }).setOrigin(0.5).setDepth(2);
-                }
-
-            } else {
-                // ── LEVEL TERKUNCI ─────────────────────────────
-                btn.setTint(0x333333);   // gelap
-
-                // Ikon gembok
-                this.add.text(pos.x, pos.y, '🔒', {
-                    fontSize: fs(26)
-                }).setOrigin(0.5).setDepth(3);
-            }
-        }
-
-        // Tombol Back
-        const btnBack = this.add.text(60, 50, '← Back', {
-            fontFamily: 'PixeloidSans', fontSize: fs(18),
-            backgroundColor: '#444', padding: { x: 10, y: 6 }
-        }).setInteractive().setOrigin(0.5).setDepth(2);
-
-        btnBack.on('pointerover',  () => btnBack.setStyle({ color: '#ffffff' }));
-        btnBack.on('pointerout',   () => btnBack.setStyle({ color: '#cccccc' }));
-        btnBack.on('pointerdown',  () => { this.scene.start('HomeScene'); });
-
-        // Tombol Reset Progress (tersembunyi kecil di pojok)
-        const btnReset = this.add.text(W - 20, H - 20, 'reset progress', {
-            fontFamily: 'PixeloidSans', fontSize: fs(11), color: '#444444'
-        }).setOrigin(1, 1).setInteractive().setDepth(2);
-
-        btnReset.on('pointerover',  () => btnReset.setColor('#ff8888'));
-        btnReset.on('pointerout',   () => btnReset.setColor('#444444'));
-        btnReset.on('pointerdown',  () => {
-            SaveManager.reset();
-            this.scene.restart();
+        const level1Btn = this.add.image(620, 250, 'level1').setInteractive().setScale(0.5);
+        level1Btn.on('pointerover', () => { level1Btn.setScale(0.6);});
+        level1Btn.on('pointerout', () => { level1Btn.setScale(0.5);level1Btn.clearTint(); }); 
+        level1Btn.on('pointerdown', () => { level1Btn.setScale(0.4); level1Btn.setTint(0xdddddd);});
+        level1Btn.on('pointerup', () => {
+            level1Btn.setScale(0.5);level1Btn.clearTint();
+            this.scene.start('GameScene', { level: "1"});
         });
+
+        const level2Btn = this.add.image(770, 250, 'level2').setInteractive().setScale(0.5);
+        level2Btn.on('pointerover', () => { level2Btn.setScale(0.6);});
+        level2Btn.on('pointerout', () => { level2Btn.setScale(0.5);level2Btn.clearTint(); }); 
+        level2Btn.on('pointerdown', () => { level2Btn.setScale(0.4); level2Btn.setTint(0xdddddd);});
+        level2Btn.on('pointerup', () => {
+            level2Btn.setScale(0.5);level2Btn.clearTint();
+            this.scene.start('GameScene', { level: "2"});
+        });
+
+        const level3Btn = this.add.image(920, 250, 'level3').setInteractive().setScale(0.5);
+        level3Btn.on('pointerover', () => { level3Btn.setScale(0.6);});
+        level3Btn.on('pointerout', () => { level3Btn.setScale(0.5);level3Btn.clearTint(); }); 
+        level3Btn.on('pointerdown', () => { level3Btn.setScale(0.4); level3Btn.setTint(0xdddddd);});
+        level3Btn.on('pointerup', () => {
+            level3Btn.setScale(0.5);level3Btn.clearTint();
+            this.scene.start('GameScene', { level: "3"});
+        });
+
+        const level4Btn = this.add.image(1070, 250, 'level4').setInteractive().setScale(0.5);
+        level4Btn.on('pointerover', () => { level4Btn.setScale(0.6);});
+        level4Btn.on('pointerout', () => { level4Btn.setScale(0.5);level4Btn.clearTint(); }); 
+        level4Btn.on('pointerdown', () => { level4Btn.setScale(0.4); level4Btn.setTint(0xdddddd);});
+        level4Btn.on('pointerup', () => {
+            level4Btn.setScale(0.5);level4Btn.clearTint();
+            this.scene.start('GameScene', { level: "4"});
+        });
+
+        const level5Btn = this.add.image(1220, 250, 'level5').setInteractive().setScale(0.5);
+        level5Btn.on('pointerover', () => { level5Btn.setScale(0.6);});
+        level5Btn.on('pointerout', () => { level5Btn.setScale(0.5);level5Btn.clearTint(); }); 
+        level5Btn.on('pointerdown', () => { level5Btn.setScale(0.4); level5Btn.setTint(0xdddddd);});
+        level5Btn.on('pointerup', () => {
+            level5Btn.setScale(0.5);level5Btn.clearTint();
+            this.scene.start('GameScene', { level: "5"});
+        });
+
+        const level6Btn = this.add.image(1370, 250, 'level6').setInteractive().setScale(0.5);
+        level6Btn.on('pointerover', () => { level6Btn.setScale(0.6);});
+        level6Btn.on('pointerout', () => { level6Btn.setScale(0.5);level6Btn.clearTint(); }); 
+        level6Btn.on('pointerdown', () => { level6Btn.setScale(0.4); level6Btn.setTint(0xdddddd);});
+        level6Btn.on('pointerup', () => {
+            level6Btn.setScale(0.5);level6Btn.clearTint();
+            this.scene.start('GameScene', { level: "6"});
+        });
+
+        const level7Btn = this.add.image(1520, 250, 'level7').setInteractive().setScale(0.5);
+        level7Btn.on('pointerover', () => { level7Btn.setScale(0.6);});
+        level7Btn.on('pointerout', () => { level7Btn.setScale(0.5);level7Btn.clearTint(); }); 
+        level7Btn.on('pointerdown', () => { level7Btn.setScale(0.4); level7Btn.setTint(0xdddddd);});
+        level7Btn.on('pointerup', () => {
+            level7Btn.setScale(0.5);level7Btn.clearTint();
+            this.scene.start('GameScene', { level: "7"});
+        });
+
+        const level8Btn = this.add.image(920, 400, 'level8').setInteractive().setScale(0.5);
+        level8Btn.on('pointerover', () => { level8Btn.setScale(0.6);});
+        level8Btn.on('pointerout', () => { level8Btn.setScale(0.5);level8Btn.clearTint(); }); 
+        level8Btn.on('pointerdown', () => { level8Btn.setScale(0.4); level8Btn.setTint(0xdddddd);});
+        level8Btn.on('pointerup', () => {
+            level8Btn.setScale(0.5);level8Btn.clearTint();
+            this.scene.start('GameScene', { level: "8"});
+        });
+
+        const level9Btn = this.add.image(1070, 400, 'level9').setInteractive().setScale(0.5);
+        level9Btn.on('pointerover', () => { level9Btn.setScale(0.6);});
+        level9Btn.on('pointerout', () => { level9Btn.setScale(0.5);level9Btn.clearTint(); }); 
+        level9Btn.on('pointerdown', () => { level9Btn.setScale(0.4); level9Btn.setTint(0xdddddd);});
+        level9Btn.on('pointerup', () => {
+            level9Btn.setScale(0.5);level9Btn.clearTint();
+            this.scene.start('GameScene', { level: "9"});
+        });
+
+        const level10Btn = this.add.image(1220, 400, 'level10').setInteractive().setScale(0.5);
+        level10Btn.on('pointerover', () => { level10Btn.setScale(0.6);});
+        level10Btn.on('pointerout', () => { level10Btn.setScale(0.5);level10Btn.clearTint(); }); 
+        level10Btn.on('pointerdown', () => { level10Btn.setScale(0.4); level10Btn.setTint(0xdddddd);});
+        level10Btn.on('pointerup', () => {
+            level10Btn.setScale(0.5);level10Btn.clearTint();
+            this.scene.start('GameScene', { level: "10"});
+        });
+
+        // Tombol Back yang konsisten dengan style level
+            const btnBack = this.add.image(100, 100, 'kembali').setScale(0.3).setInteractive();
+            btnBack.on('pointerdown', () => btnBack.setTint(0xdddddd));
+            btnBack.on('pointerup', () => this.scene.start('HomeScene'));
     }
 }
