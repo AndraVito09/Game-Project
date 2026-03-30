@@ -21,6 +21,32 @@ export default class LevelSelectScene extends Phaser.Scene {
     }
 
     create() {
+        const bgs = this.sound.get('bgs');
+        if (bgs) bgs.stop();
+
+        // Pastikan bgm jalan
+        const bgm = this.sound.get('bgm');
+        if (bgm && !bgm.isPlaying) bgm.play();
+        // Tambah GIF via HTML murni
+        const gif = document.createElement('img');
+        gif.src = './assets/character/mio.gif';
+        gif.style.cssText = `
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            left: 400px;
+            top: 300px;
+            pointer-events: none;
+            z-index: 10;
+        `;
+        gif.id = 'mio-gif';
+        document.getElementById('game-container').appendChild(gif);
+
+        // Hapus saat scene shutdown
+        this.events.on('shutdown', () => {
+            const el = document.getElementById('mio-gif');
+            if (el) el.remove();
+        });
         this.music = this.sound.get('bgm');
 
         this.events.on('shutdown', () => {
@@ -284,10 +310,14 @@ export default class LevelSelectScene extends Phaser.Scene {
     }
 
     _showResetOverlay() {
+        const gif = document.getElementById('mio-gif');
+        if (gif) gif.style.display = 'none';
         this._overlayElements.forEach(el => el.setVisible(true));
     }
 
     _hideResetOverlay() {
+        const gif = document.getElementById('mio-gif');
+        if (gif) gif.style.display = 'block';
         this._overlayElements.forEach(el => el.setVisible(false));
     }
 
