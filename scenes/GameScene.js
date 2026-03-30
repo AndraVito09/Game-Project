@@ -585,7 +585,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Panel
         const panelW = W * 0.46;
-        const panelH = H * 0.66;
+        const panelH = H * 0.75;
 
         // Shadow
         this.add.rectangle(cx + 6, cy + 6, panelW, panelH, 0x000000, 0.5).setDepth(D + 1);
@@ -599,13 +599,13 @@ export default class GameScene extends Phaser.Scene {
 
         // Ikon
         this.add.text(cx, cy - panelH * 0.34, '⭐', {
-            fontSize: fs(52)
+            fontSize: fs(30)
         }).setOrigin(0.5).setDepth(D + 3);
 
         // Judul
         this.add.text(cx, cy - panelH * 0.19, 'LEVEL COMPLETE!', {
             fontFamily: 'PixeloidSans-Bold',
-            fontSize:   fs(30),
+            fontSize:   fs(20),
             color:      '#FFD700'
         }).setOrigin(0.5).setDepth(D + 3);
 
@@ -649,9 +649,9 @@ export default class GameScene extends Phaser.Scene {
 
         if (hasNextLevel) {
             this._overlayButton(
-                cx, cy + panelH * 0.36,
+                cx, cy + panelH * 0.34,
                 `  ▶  Level ${nextLevel}  `,
-                fs(18), 0x005500, 0x00aa00, 0x003300, '#ffffff', D + 3,
+                fs(10), 0x005500, 0x00aa00, 0x003300, '#ffffff', D + 3,
                 () => {
                     this.scene.restart({
                         level: nextLevel, questionIndex: 0,
@@ -667,9 +667,9 @@ export default class GameScene extends Phaser.Scene {
 
         // Tombol PILIH LEVEL
         this._overlayButton(
-            cx, cy + panelH * 0.47,
+            cx, cy + panelH * 0.44,
             '  ☰  Pilih Level  ',
-            fs(16), 0x444400, 0x888800, 0x333300, '#ffffff', D + 3,
+            fs(10), 0x444400, 0x888800, 0x333300, '#ffffff', D + 3,
             () => this.scene.start('LevelSelectScene')
         );
     }
@@ -691,8 +691,8 @@ export default class GameScene extends Phaser.Scene {
         this.tweens.add({ targets: overlay, fillAlpha: 0.75, duration: 300, ease: 'Power2' });
 
         // Panel
-        const panelW = W * 0.44;
-        const panelH = H * 0.65;
+        const panelW = W * 0.46;
+        const panelH = H * 0.75;
 
         // Shadow
         this.add.rectangle(cx + 6, cy + 6, panelW, panelH, 0x000000, 0.5).setDepth(D + 1);
@@ -705,8 +705,8 @@ export default class GameScene extends Phaser.Scene {
         this.add.rectangle(cx, cy - panelH / 2 + 6, panelW, 6, 0xff4444).setDepth(D + 3);
 
         // Ikon
-        this.add.text(cx, cy - panelH * 0.33, '💀', {
-            fontSize: fs(52)
+        this.add.text(cx, cy - panelH * 0.34, '💀', {
+            fontSize: fs(30)
         }).setOrigin(0.5).setDepth(D + 3);
 
         // Judul
@@ -737,7 +737,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Pesan kriteria gagal
         this.add.text(cx, cy + panelH * 0.25,
-            `Butuh min. ${this.MIN_CORRECT} soal benar atau ${this.MIN_SCORE} skor\nuntuk membuka level berikutnya.`, {
+            `Butuh min. ${this.MIN_CORRECT} soal benar\nuntuk membuka level berikutnya.`, {
             fontFamily: 'PixeloidSans', fontSize: fs(13), color: '#ff8800', align: 'center'
         }).setOrigin(0.5).setDepth(D + 3);
 
@@ -746,9 +746,9 @@ export default class GameScene extends Phaser.Scene {
 
         // Tombol COBA LAGI
         this._overlayButton(
-            cx, cy + panelH * 0.39,
+            cx, cy + panelH * 0.38,
             '  ↺  Coba Lagi  ',
-            fs(18), 0x007700, 0x00aa00, 0x005500, '#ffffff', D + 3,
+            fs(7), 0x007700, 0x00aa00, 0x005500, '#ffffff', D + 3,
             () => {
                 this.scene.restart({
                     level: this.level, questionIndex: 0,
@@ -759,9 +759,9 @@ export default class GameScene extends Phaser.Scene {
 
         // Tombol PILIH LEVEL
         this._overlayButton(
-            cx, cy + panelH * 0.49,
+            cx, cy + panelH * 0.45,
             '  ☰  Pilih Level  ',
-            fs(16), 0x444400, 0x888800, 0x333300, '#ffffff', D + 3,
+            fs(7), 0x444400, 0x888800, 0x333300, '#ffffff', D + 3,
             () => this.scene.start('LevelSelectScene')
         );
     }
