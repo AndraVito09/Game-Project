@@ -43,7 +43,7 @@ export default class LevelSelectScene extends Phaser.Scene {
             '🔒 Selesaikan level sebelumnya dengan minimal 3 soal benar atau 60 skor untuk membuka level berikutnya', {
             fontFamily: 'PixeloidSans',
             fontSize:   fs(13),
-            color:      '#000000ff',
+            color:      '#ffcc44',
             align:      'center',
             wordWrap:   { width: W * 0.75 }
         }).setOrigin(0.5).setDepth(2);
@@ -151,7 +151,7 @@ export default class LevelSelectScene extends Phaser.Scene {
     _showLockTooltip(x, y, msg, fs) {
         const lines = msg.split('\n').length;
         const h     = 30 + lines * 20;
-        const w     = 500;
+        const w     = 240;
         this._tooltipBg.setPosition(x, y).setSize(w, h).setVisible(true);
         this._tooltipText.setPosition(x, y).setText(msg).setFontSize(fs ? fs(12) : '12px').setVisible(true);
     }

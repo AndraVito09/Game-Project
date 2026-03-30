@@ -9,15 +9,15 @@ export default class GameScene extends Phaser.Scene {
         this.cache.json.remove('sentences');
         this.load.json('sentences', 'assets/data/sentences.json');
         this.load.image('background', 'assets/gameplaybg.png');
-        this.load.image('kembali','assets/back.png');
+        this.load.image('kembali', 'assets/back.png');
         this.load.audio('bgs', 'assets/sound/gssound.ogg');
     }
 
     init(data) {
-        this.level         = Number(data.level) || 1;
+        this.level         = Number(data.level)        || 1;
         this.questionIndex = Number(data.questionIndex) || 0;
-        this.score         = Number(data.score) || 0;
-        this.lives         = Number(data.lives) || 3;
+        this.score         = Number(data.score)        || 0;
+        this.lives         = Number(data.lives)        || 3;
         this.correctCount  = Number(data.correctCount) || 0;
     }
 
@@ -40,14 +40,14 @@ export default class GameScene extends Phaser.Scene {
         const sentences = data.levels[this.level];
 
         if (!sentences) {
-            console.error("Sentences not found for level:", this.level);
+            console.error('Sentences not found for level:', this.level);
             return;
         }
 
-        const sentenceObj    = sentences[this.questionIndex];
-        this.correctWords    = sentenceObj.text.split(' ');
-        const translation    = sentenceObj.translation;
-        const wordTrans      = sentenceObj.wordTranslations || {};
+        const sentenceObj = sentences[this.questionIndex];
+        this.correctWords = sentenceObj.text.split(' ');
+        const translation = sentenceObj.translation;
+        const wordTrans   = sentenceObj.wordTranslations || {};
 
         this.playerWords     = [];
         this.totalQuestions  = sentences.length;
@@ -55,12 +55,11 @@ export default class GameScene extends Phaser.Scene {
         this.wordButtons     = [];
         this.answerSlots     = [];
 
-        // Kriteria lulus level
-        this.MIN_CORRECT  = 3;
-        this.MIN_SCORE    = 60;
+        // Kriteria lulus
+        this.MIN_CORRECT = 3;
+        this.MIN_SCORE   = 60;
 
         const shuffled = Phaser.Utils.Array.Shuffle([...this.correctWords]);
-
         const fs = (n) => `${Math.round(n * W / 800)}px`;
 
         // ── Posisi papan tulis ─────────────────────────────────
@@ -97,7 +96,7 @@ export default class GameScene extends Phaser.Scene {
             color:      '#ff4444'
         }).setOrigin(1, 0).setDepth(1);
 
-        // ── Counter jawaban benar (kiri bawah score) ───────────
+        // ── Counter jawaban benar ──────────────────────────────
         this.correctCountText = this.add.text(W * 0.02, H * 0.08,
             `✓ Benar: ${this.correctCount}/${this.MIN_CORRECT}`, {
             fontFamily: 'PixeloidMono',
@@ -105,7 +104,7 @@ export default class GameScene extends Phaser.Scene {
             color:      this.correctCount >= this.MIN_CORRECT ? '#00FF99' : '#aaffaa'
         }).setDepth(1);
 
-        // ── Hint kriteria lulus (kanan bawah lives) ────────────
+        // ── Hint kriteria lulus ────────────────────────────────
         this.add.text(W * 0.98, H * 0.08,
             `🎯 Lulus: min. ${this.MIN_CORRECT} benar / ${this.MIN_SCORE} skor`, {
             fontFamily: 'PixeloidSans',
@@ -120,9 +119,7 @@ export default class GameScene extends Phaser.Scene {
         const transY    = boardTop + boardH * 0.18;
 
         this.translationBox = this.add.rectangle(boardCX, transY, transBoxW, transBoxH, 0x1a1a2e)
-            .setVisible(false)
-            .setStrokeStyle(2, 0xFFD700)
-            .setDepth(3);
+            .setVisible(false).setStrokeStyle(2, 0xFFD700).setDepth(3);
 
         this.translationLabel = this.add.text(
             boardCX - transBoxW / 2 + 10,
@@ -155,16 +152,14 @@ export default class GameScene extends Phaser.Scene {
         const slotH     = slotFontSz + slotPadY * 2 + 4;
         const slotSpacX = slotW + 10;
         const slotSpacY = slotH + 14;
-
-        const ansBoxH  = (slotH + 16) * rowCount + 20;
-        const ansY     = boardTop + boardH * 0.58;
+        const ansBoxH   = (slotH + 16) * rowCount + 20;
+        const ansY      = boardTop + boardH * 0.58;
 
         this.answerBox = this.add.rectangle(boardCX, ansY, ansBoxW, ansBoxH, 0x222244)
-            .setStrokeStyle(2, 0x5555aa)
-            .setDepth(1);
+            .setStrokeStyle(2, 0x5555aa).setDepth(1);
 
         const slotStartX = boardCX - ((maxCols2 - 1) * slotSpacX) / 2;
-        const slotStartY = ansY - ((rowCount - 1) * slotSpacY) / 2;
+        const slotStartY = ansY    - ((rowCount - 1) * slotSpacY) / 2;
 
         this.correctWords.forEach((_, i) => {
             const col = i % maxCols2;
@@ -173,8 +168,7 @@ export default class GameScene extends Phaser.Scene {
             const sy  = slotStartY + row * slotSpacY;
 
             const slotBg = this.add.rectangle(sx, sy, slotW, slotH, 0x333366)
-                .setStrokeStyle(1, 0x7777bb)
-                .setDepth(2);
+                .setStrokeStyle(1, 0x7777bb).setDepth(2);
 
             const slotTxt = this.add.text(sx, sy, '____', {
                 fontFamily: 'PixeloidSans',
@@ -183,25 +177,15 @@ export default class GameScene extends Phaser.Scene {
                 align:      'center'
             }).setOrigin(0.5).setDepth(3);
 
-            this.answerSlots.push({
-                index:   i,
-                x:       sx,
-                y:       sy,
-                w:       slotW,
-                h:       slotH,
-                bg:      slotBg,
-                txt:     slotTxt,
-                word:    null,
-                wordBtn: null
-            });
+            this.answerSlots.push({ index: i, x: sx, y: sy, w: slotW, h: slotH,
+                                    bg: slotBg, txt: slotTxt, word: null, wordBtn: null });
         });
 
         // ── Tooltip ────────────────────────────────────────────
         this.tooltipShadow = this.add.rectangle(0, 0, 160, 38, 0x000000, 0.5)
             .setVisible(false).setDepth(19);
         this.tooltipBox = this.add.rectangle(0, 0, 160, 38, 0x111133)
-            .setStrokeStyle(1, 0xFFD700)
-            .setVisible(false).setDepth(20);
+            .setStrokeStyle(1, 0xFFD700).setVisible(false).setDepth(20);
         this.tooltipText = this.add.text(0, 0, '', {
             fontFamily: 'PixeloidSans, Arial',
             fontSize:   fs(13),
@@ -209,7 +193,7 @@ export default class GameScene extends Phaser.Scene {
             align:      'center'
         }).setOrigin(0.5).setVisible(false).setDepth(21);
 
-        // ── Tombol Kata (Sumber Drag) ──────────────────────────
+        // ── Tombol Kata ────────────────────────────────────────
         const maxCols    = Math.min(shuffled.length, 5);
         const colSpacing = W * 0.15;
         const rowSpacing = H * 0.09;
@@ -249,12 +233,10 @@ export default class GameScene extends Phaser.Scene {
                     this.tooltipText.setPosition(bx, by).setText(hint).setVisible(true);
                 }
             });
-
             wordBtn.on('pointerout', () => {
                 if (!wordBtn.placed) wordBtn.setStyle({ backgroundColor: '#444466' });
                 this._hideTooltip();
             });
-
             wordBtn.on('dragstart', () => {
                 if (wordBtn.placed) return;
                 this._hideTooltip();
@@ -264,22 +246,16 @@ export default class GameScene extends Phaser.Scene {
                     if (!slot.word) slot.bg.setStrokeStyle(2, 0xFFD700);
                 });
             });
-
             wordBtn.on('drag', (pointer, dragX, dragY) => {
                 if (wordBtn.placed) return;
                 wordBtn.setPosition(dragX, dragY);
                 this.answerSlots.forEach(slot => {
                     if (slot.word) return;
                     const dist = Phaser.Math.Distance.Between(dragX, dragY, slot.x, slot.y);
-                    if (dist < slotW * 0.9) {
-                        slot.bg.setFillStyle(0x444488);
-                    } else {
-                        slot.bg.setFillStyle(0x333366);
-                        slot.bg.setStrokeStyle(2, 0xFFD700);
-                    }
+                    slot.bg.setFillStyle(dist < slotW * 0.9 ? 0x444488 : 0x333366);
+                    if (dist >= slotW * 0.9) slot.bg.setStrokeStyle(2, 0xFFD700);
                 });
             });
-
             wordBtn.on('dragend', () => {
                 if (wordBtn.placed) return;
                 wordBtn.setDepth(5);
@@ -290,24 +266,16 @@ export default class GameScene extends Phaser.Scene {
                     }
                 });
 
-                let nearest     = null;
-                let nearestDist = Infinity;
+                let nearest = null, nearestDist = Infinity;
                 const snapRadius = slotW * 1.2;
-
                 this.answerSlots.forEach(slot => {
                     if (slot.word) return;
                     const dist = Phaser.Math.Distance.Between(wordBtn.x, wordBtn.y, slot.x, slot.y);
-                    if (dist < snapRadius && dist < nearestDist) {
-                        nearest     = slot;
-                        nearestDist = dist;
-                    }
+                    if (dist < snapRadius && dist < nearestDist) { nearest = slot; nearestDist = dist; }
                 });
 
-                if (nearest) {
-                    this._placeWordInSlot(wordBtn, nearest, sentences);
-                } else {
-                    this._returnWordBtn(wordBtn);
-                }
+                nearest ? this._placeWordInSlot(wordBtn, nearest, sentences)
+                        : this._returnWordBtn(wordBtn);
             });
         });
 
@@ -326,52 +294,37 @@ export default class GameScene extends Phaser.Scene {
         resetBtn.on('pointerout',  () => resetBtn.setColor('#aaaaaa'));
         resetBtn.on('pointerdown', () => {
             this.scene.restart({
-                level:         this.level,
-                questionIndex: this.questionIndex,
-                score:         this.score,
-                lives:         this.lives,
-                correctCount:  this.correctCount
+                level: this.level, questionIndex: this.questionIndex,
+                score: this.score, lives: this.lives, correctCount: this.correctCount
             });
         });
 
         // ── Tombol Back ────────────────────────────────────────
-        const btnBack = this.add.image(W * 0.04, H * 0.95, 'kembali');
-        btnBack.setInteractive();
-        btnBack.setScale(0.3);
+        const btnBack = this.add.image(W * 0.04, H * 0.95, 'kembali')
+            .setInteractive().setScale(0.3);
         btnBack.on('pointerdown', () => {
             if (this.music) this.music.stop();
-            this.scene.start('LevelSelectScene');
-        });
+            this.scene.start('LevelSelectScene')});
+
+        // Simpan fs untuk dipakai method lain
+        this._fs = fs;
     }
 
     // ── Snap kata ke slot ──────────────────────────────────────
     _placeWordInSlot(wordBtn, slot, sentences) {
-        slot.word      = wordBtn.word;
-        slot.wordBtn   = wordBtn;
+        slot.word = wordBtn.word; slot.wordBtn = wordBtn;
         wordBtn.placed = true;
+        wordBtn.setAlpha(0.3).setPosition(wordBtn.origX, wordBtn.origY).disableInteractive();
 
-        wordBtn.setAlpha(0.3);
-        wordBtn.setPosition(wordBtn.origX, wordBtn.origY);
-        wordBtn.disableInteractive();
+        slot.txt.setText(wordBtn.word).setColor('#00FF99');
+        slot.bg.setFillStyle(0x224422).setStrokeStyle(2, 0x00FF99);
 
-        slot.txt.setText(wordBtn.word);
-        slot.txt.setColor('#00FF99');
-        slot.bg.setFillStyle(0x224422);
-        slot.bg.setStrokeStyle(2, 0x00FF99);
-
-        this.tweens.add({
-            targets:  slot.txt,
-            scaleX:   1.08,
-            scaleY:   1.08,
-            duration: 80,
-            yoyo:     true,
-            ease:     'Power1'
-        });
+        this.tweens.add({ targets: slot.txt, scaleX: 1.08, scaleY: 1.08,
+                          duration: 80, yoyo: true, ease: 'Power1' });
 
         this.playerWords = this.answerSlots.map(s => s.word || '');
 
-        const allFilled = this.answerSlots.every(s => s.word);
-        if (allFilled) {
+        if (this.answerSlots.every(s => s.word)) {
             this.translationBox.setVisible(true);
             this.translationLabel.setVisible(true);
             this.translationText.setVisible(true);
@@ -381,13 +334,8 @@ export default class GameScene extends Phaser.Scene {
     }
 
     _returnWordBtn(wordBtn) {
-        this.tweens.add({
-            targets:  wordBtn,
-            x:        wordBtn.origX,
-            y:        wordBtn.origY,
-            duration: 200,
-            ease:     'Back.Out'
-        });
+        this.tweens.add({ targets: wordBtn, x: wordBtn.origX, y: wordBtn.origY,
+                          duration: 200, ease: 'Back.Out' });
         wordBtn.setStyle({ backgroundColor: '#444466' });
     }
 
@@ -403,7 +351,7 @@ export default class GameScene extends Phaser.Scene {
         const W  = this.scale.width;
         const H  = this.scale.height;
         const cx = W / 2;
-        const fs = (n) => `${Math.round(n * W / 800)}px`;
+        const fs = this._fs;
 
         const isCorrect = this.playerWords.join(' ') === this.correctWords.join(' ');
 
@@ -414,30 +362,23 @@ export default class GameScene extends Phaser.Scene {
                 this.correctCount += 1;
                 this.scoreText.setText(`Score: ${this.score}`);
                 this.correctCountText.setText(`✓ Benar: ${this.correctCount}/${this.MIN_CORRECT}`);
-                if (this.correctCount >= this.MIN_CORRECT) {
+                if (this.correctCount >= this.MIN_CORRECT)
                     this.correctCountText.setColor('#00FF99');
-                }
 
                 this.answerSlots.forEach(s => {
-                    s.bg.setFillStyle(0x003300);
-                    s.bg.setStrokeStyle(2, 0x00ff99);
+                    s.bg.setFillStyle(0x003300).setStrokeStyle(2, 0x00ff99);
                 });
 
                 this.add.text(cx, H * 0.82, '✓ Benar! +20', {
-                    fontFamily: 'PixeloidSans-Bold',
-                    fontSize:   fs(20),
-                    color:      '#00ff99'
+                    fontFamily: 'PixeloidSans-Bold', fontSize: fs(20), color: '#00ff99'
                 }).setOrigin(0.5).setDepth(5);
 
                 this.time.delayedCall(1000, () => {
-                    const nextIndex = this.questionIndex + 1;
-                    if (nextIndex < sentences.length) {
+                    const next = this.questionIndex + 1;
+                    if (next < sentences.length) {
                         this.scene.restart({
-                            level:         this.level,
-                            questionIndex: nextIndex,
-                            score:         this.score,
-                            lives:         this.lives,
-                            correctCount:  this.correctCount
+                            level: this.level, questionIndex: next,
+                            score: this.score, lives: this.lives, correctCount: this.correctCount
                         });
                     } else {
                         this.checkLevelResult();
@@ -445,48 +386,34 @@ export default class GameScene extends Phaser.Scene {
                 });
 
             } else {
-                // ── SALAH: kurangi nyawa, lanjut ke soal berikutnya ──
+                // ── SALAH: kurangi nyawa, lanjut soal berikutnya ──
                 this.lives -= 1;
                 this.livesText.setText(`♥ ${this.lives}`);
-
                 this.answerSlots.forEach(s => {
-                    s.bg.setFillStyle(0x330000);
-                    s.bg.setStrokeStyle(2, 0xff4444);
+                    s.bg.setFillStyle(0x330000).setStrokeStyle(2, 0xff4444);
                 });
 
                 if (this.lives <= 0) {
-                    // Nyawa habis
                     this.add.text(cx, H * 0.82, 'Nyawa Habis!', {
-                        fontFamily: 'PixeloidSans-Bold',
-                        fontSize:   fs(22),
-                        color:      '#ff0000'
+                        fontFamily: 'PixeloidSans-Bold', fontSize: fs(22), color: '#ff0000'
                     }).setOrigin(0.5).setDepth(5);
 
-                    this.time.delayedCall(800, () => {
-                        this._handleLivesOut();
-                    });
+                    this.time.delayedCall(800, () => this._handleLivesOut());
 
                 } else {
-                    // Masih ada nyawa — lanjut soal berikutnya (BUKAN reset soal sama)
+                    // Lanjut ke soal berikutnya (bukan reset soal sama)
                     this.add.text(cx, H * 0.82, `✗ Salah! Sisa nyawa: ${this.lives}`, {
-                        fontFamily: 'PixeloidSans-Bold',
-                        fontSize:   fs(18),
-                        color:      '#ff4444'
+                        fontFamily: 'PixeloidSans-Bold', fontSize: fs(18), color: '#ff4444'
                     }).setOrigin(0.5).setDepth(5);
 
                     this.time.delayedCall(1200, () => {
-                        const nextIndex = this.questionIndex + 1;
-                        if (nextIndex < sentences.length) {
-                            // Lanjut soal berikutnya
+                        const next = this.questionIndex + 1;
+                        if (next < sentences.length) {
                             this.scene.restart({
-                                level:         this.level,
-                                questionIndex: nextIndex,
-                                score:         this.score,
-                                lives:         this.lives,
-                                correctCount:  this.correctCount
+                                level: this.level, questionIndex: next,
+                                score: this.score, lives: this.lives, correctCount: this.correctCount
                             });
                         } else {
-                            // Soal habis (selesai di soal terakhir dan salah)
                             this.checkLevelResult();
                         }
                     });
@@ -495,62 +422,257 @@ export default class GameScene extends Phaser.Scene {
         });
     }
 
-    /**
-     * Dipanggil saat nyawa = 0.
-     * Kriteria lulus: benar >= MIN_CORRECT ATAU score >= MIN_SCORE
-     * Lulus  → popup UIScene (Level Complete)
-     * Gagal  → GameOverScene
-     */
+    // Nyawa habis di tengah permainan → cek kriteria
     _handleLivesOut() {
         const passed = (this.correctCount >= this.MIN_CORRECT) || (this.score >= this.MIN_SCORE);
-
         if (passed) {
             SaveManager.recordLevelResult(this.level, this.score, this.correctCount);
-            this.scene.start('UIScene', {
-                level:        this.level,
-                score:        this.score,
-                correctCount: this.correctCount
-            });
+            this._showLevelCompleteOverlay();
         } else {
-            this.scene.start('GameOverScene', {
-                level:        this.level,
-                score:        this.score,
-                correctCount: this.correctCount
-            });
+            this._showGameOverOverlay();
         }
     }
 
+    // Semua soal habis → cek kriteria
     checkLevelResult() {
         const passed = (this.correctCount >= this.MIN_CORRECT) || (this.score >= this.MIN_SCORE);
-
         if (passed) {
             SaveManager.recordLevelResult(this.level, this.score, this.correctCount);
-            this.scene.start('UIScene', {
-                level:        this.level,
-                score:        this.score,
-                correctCount: this.correctCount
-            });
+            this._showLevelCompleteOverlay();
         } else {
-            const W  = this.scale.width;
-            const H  = this.scale.height;
-            const cx = W / 2;
-            const fs = (n) => `${Math.round(n * W / 800)}px`;
-
-            this.add.text(cx, H * 0.65,
-                `Score: ${this.score}  |  Benar: ${this.correctCount}/${this.totalQuestions}\nMinimal ${this.MIN_CORRECT} soal benar atau ${this.MIN_SCORE} skor untuk lulus!`, {
-                fontFamily: 'PixeloidSans-Bold',
-                fontSize:   fs(18),
-                color:      '#ff8800',
-                align:      'center'
-            }).setOrigin(0.5).setDepth(5);
-
-            this.time.delayedCall(2500, () => {
-                this.scene.start('GameOverScene', {
-                    level:        this.level,
-                    score:        this.score,
-                    correctCount: this.correctCount
-                });
-            });
+            this._showGameOverOverlay();
         }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // OVERLAY LEVEL COMPLETE (lulus)
+    // ══════════════════════════════════════════════════════════
+    _showLevelCompleteOverlay() {
+        const W   = this.scale.width;
+        const H   = this.scale.height;
+        const cx  = W / 2;
+        const cy  = H / 2;
+        const fs  = this._fs;
+        const D   = 50; // depth base overlay
+
+        // Overlay gelap — memblok klik ke elemen game di bawahnya
+        const overlay = this.add.rectangle(cx, cy, W, H, 0x000000, 0)
+            .setDepth(D).setInteractive(); // blok klik ke bawah
+        this.tweens.add({ targets: overlay, fillAlpha: 0.72, duration: 300, ease: 'Power2' });
+
+        // Panel
+        const panelW = W * 0.46;
+        const panelH = H * 0.66;
+
+        // Shadow
+        this.add.rectangle(cx + 6, cy + 6, panelW, panelH, 0x000000, 0.5).setDepth(D + 1);
+        // Panel utama
+        const panel = this.add.rectangle(cx, cy, panelW, panelH, 0x1a1a2e)
+            .setStrokeStyle(3, 0xFFD700).setDepth(D + 2).setAlpha(0);
+        this.tweens.add({ targets: panel, alpha: 1, duration: 300, ease: 'Power2' });
+
+        // Garis atas
+        this.add.rectangle(cx, cy - panelH / 2 + 6, panelW, 6, 0xFFD700).setDepth(D + 3);
+
+        // Ikon
+        this.add.text(cx, cy - panelH * 0.34, '⭐', {
+            fontSize: fs(52)
+        }).setOrigin(0.5).setDepth(D + 3);
+
+        // Judul
+        this.add.text(cx, cy - panelH * 0.19, 'LEVEL COMPLETE!', {
+            fontFamily: 'PixeloidSans-Bold',
+            fontSize:   fs(30),
+            color:      '#FFD700'
+        }).setOrigin(0.5).setDepth(D + 3);
+
+        // Sub judul
+        this.add.text(cx, cy - panelH * 0.07, `Level ${this.level} Selesai`, {
+            fontFamily: 'PixeloidSans',
+            fontSize:   fs(17),
+            color:      '#aaaacc'
+        }).setOrigin(0.5).setDepth(D + 3);
+
+        // Divider
+        this.add.rectangle(cx, cy + panelH * 0.02, panelW * 0.75, 2, 0x444466).setDepth(D + 3);
+
+        // Statistik: Score
+        this.add.text(cx - panelW * 0.18, cy + panelH * 0.08, 'Score', {
+            fontFamily: 'PixeloidSans', fontSize: fs(13), color: '#888888'
+        }).setOrigin(0.5).setDepth(D + 3);
+        this.add.text(cx - panelW * 0.18, cy + panelH * 0.15, `${this.score}`, {
+            fontFamily: 'PixeloidSans-Bold', fontSize: fs(26), color: '#00FF99'
+        }).setOrigin(0.5).setDepth(D + 3);
+
+        // Statistik: Soal Benar
+        this.add.text(cx + panelW * 0.18, cy + panelH * 0.08, 'Soal Benar', {
+            fontFamily: 'PixeloidSans', fontSize: fs(13), color: '#888888'
+        }).setOrigin(0.5).setDepth(D + 3);
+        this.add.text(cx + panelW * 0.18, cy + panelH * 0.15, `${this.correctCount}`, {
+            fontFamily: 'PixeloidSans-Bold', fontSize: fs(26), color: '#FFD700'
+        }).setOrigin(0.5).setDepth(D + 3);
+
+        // Pesan kriteria
+        const critMsg = (this.correctCount >= this.MIN_CORRECT)
+            ? `✓ ${this.correctCount} soal benar — kriteria terpenuhi!`
+            : `✓ Score ${this.score} — kriteria skor terpenuhi!`;
+        this.add.text(cx, cy + panelH * 0.24, critMsg, {
+            fontFamily: 'PixeloidSans', fontSize: fs(13), color: '#00FF99', align: 'center'
+        }).setOrigin(0.5).setDepth(D + 3);
+
+        // Tombol NEXT LEVEL
+        const nextLevel    = this.level + 1;
+        const hasNextLevel = nextLevel <= 10;
+
+        if (hasNextLevel) {
+            this._overlayButton(
+                cx, cy + panelH * 0.36,
+                `  ▶  Level ${nextLevel}  `,
+                fs(18), 0x005500, 0x00aa00, 0x003300, '#ffffff', D + 3,
+                () => {
+                    this.scene.restart({
+                        level: nextLevel, questionIndex: 0,
+                        score: 0, lives: 3, correctCount: 0
+                    });
+                }
+            );
+        } else {
+            this.add.text(cx, cy + panelH * 0.36, '🏆 Semua Level Selesai!', {
+                fontFamily: 'PixeloidSans-Bold', fontSize: fs(20), color: '#FFD700'
+            }).setOrigin(0.5).setDepth(D + 3);
+        }
+
+        // Tombol PILIH LEVEL
+        this._overlayButton(
+            cx, cy + panelH * 0.47,
+            '  ☰  Pilih Level  ',
+            fs(16), 0x444400, 0x888800, 0x333300, '#ffffff', D + 3,
+            () => this.scene.start('LevelSelectScene')
+        );
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // OVERLAY GAME OVER (gagal)
+    // ══════════════════════════════════════════════════════════
+    _showGameOverOverlay() {
+        const W   = this.scale.width;
+        const H   = this.scale.height;
+        const cx  = W / 2;
+        const cy  = H / 2;
+        const fs  = this._fs;
+        const D   = 50;
+
+        // Overlay gelap — memblok klik ke elemen game di bawahnya
+        const overlay = this.add.rectangle(cx, cy, W, H, 0x000000, 0)
+            .setDepth(D).setInteractive();
+        this.tweens.add({ targets: overlay, fillAlpha: 0.75, duration: 300, ease: 'Power2' });
+
+        // Panel
+        const panelW = W * 0.44;
+        const panelH = H * 0.65;
+
+        // Shadow
+        this.add.rectangle(cx + 6, cy + 6, panelW, panelH, 0x000000, 0.5).setDepth(D + 1);
+        // Panel utama
+        const panel = this.add.rectangle(cx, cy, panelW, panelH, 0x1a1a2e)
+            .setStrokeStyle(3, 0xff4444).setDepth(D + 2).setAlpha(0);
+        this.tweens.add({ targets: panel, alpha: 1, duration: 300, ease: 'Power2' });
+
+        // Garis atas
+        this.add.rectangle(cx, cy - panelH / 2 + 6, panelW, 6, 0xff4444).setDepth(D + 3);
+
+        // Ikon
+        this.add.text(cx, cy - panelH * 0.33, '💀', {
+            fontSize: fs(52)
+        }).setOrigin(0.5).setDepth(D + 3);
+
+        // Judul
+        this.add.text(cx, cy - panelH * 0.17, 'GAME OVER', {
+            fontFamily: 'PixeloidSans-Bold', fontSize: fs(34), color: '#ff4444'
+        }).setOrigin(0.5).setDepth(D + 3);
+
+        // Info level
+        this.add.text(cx, cy - panelH * 0.04, `Level ${this.level}`, {
+            fontFamily: 'PixeloidSans', fontSize: fs(18), color: '#aaaacc'
+        }).setOrigin(0.5).setDepth(D + 3);
+
+        // Statistik: Score
+        this.add.text(cx - panelW * 0.2, cy + panelH * 0.07, 'Score', {
+            fontFamily: 'PixeloidSans', fontSize: fs(13), color: '#888888'
+        }).setOrigin(0.5).setDepth(D + 3);
+        this.add.text(cx - panelW * 0.2, cy + panelH * 0.14, `${this.score}`, {
+            fontFamily: 'PixeloidSans-Bold', fontSize: fs(24), color: '#ff8888'
+        }).setOrigin(0.5).setDepth(D + 3);
+
+        // Statistik: Soal Benar
+        this.add.text(cx + panelW * 0.2, cy + panelH * 0.07, 'Soal Benar', {
+            fontFamily: 'PixeloidSans', fontSize: fs(13), color: '#888888'
+        }).setOrigin(0.5).setDepth(D + 3);
+        this.add.text(cx + panelW * 0.2, cy + panelH * 0.14, `${this.correctCount}`, {
+            fontFamily: 'PixeloidSans-Bold', fontSize: fs(24), color: '#ffaaaa'
+        }).setOrigin(0.5).setDepth(D + 3);
+
+        // Pesan kriteria gagal
+        this.add.text(cx, cy + panelH * 0.25,
+            `Butuh min. ${this.MIN_CORRECT} soal benar atau ${this.MIN_SCORE} skor\nuntuk membuka level berikutnya.`, {
+            fontFamily: 'PixeloidSans', fontSize: fs(13), color: '#ff8800', align: 'center'
+        }).setOrigin(0.5).setDepth(D + 3);
+
+        // Divider
+        this.add.rectangle(cx, cy + panelH * 0.32, panelW * 0.7, 2, 0x444466).setDepth(D + 3);
+
+        // Tombol COBA LAGI
+        this._overlayButton(
+            cx, cy + panelH * 0.39,
+            '  ↺  Coba Lagi  ',
+            fs(18), 0x007700, 0x00aa00, 0x005500, '#ffffff', D + 3,
+            () => {
+                this.scene.restart({
+                    level: this.level, questionIndex: 0,
+                    score: 0, lives: 3, correctCount: 0
+                });
+            }
+        );
+
+        // Tombol PILIH LEVEL
+        this._overlayButton(
+            cx, cy + panelH * 0.49,
+            '  ☰  Pilih Level  ',
+            fs(16), 0x444400, 0x888800, 0x333300, '#ffffff', D + 3,
+            () => this.scene.start('LevelSelectScene')
+        );
+    }
+
+    // ── Helper tombol untuk overlay ────────────────────────────
+    _overlayButton(x, y, label, fontSize, colorNormal, colorHover, colorPress, textColor, depth, callback) {
+        const btn = this.add.text(x, y, label, {
+            fontFamily:      'PixeloidSans-Bold',
+            fontSize:        fontSize,
+            color:           textColor,
+            backgroundColor: `#${colorNormal.toString(16).padStart(6, '0')}`,
+            padding:         { x: 18, y: 10 }
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(depth);
+
+        btn.on('pointerover', () => {
+            btn.setStyle({ backgroundColor: `#${colorHover.toString(16).padStart(6, '0')}` });
+            this.tweens.add({ targets: btn, scaleX: 1.05, scaleY: 1.05, duration: 80, ease: 'Power1' });
+        });
+        btn.on('pointerout', () => {
+            btn.setStyle({ backgroundColor: `#${colorNormal.toString(16).padStart(6, '0')}` });
+            this.tweens.add({ targets: btn, scaleX: 1, scaleY: 1, duration: 80, ease: 'Power1' });
+        });
+        btn.on('pointerdown', () => {
+            btn.setStyle({ backgroundColor: `#${colorPress.toString(16).padStart(6, '0')}` });
+            this.tweens.add({ targets: btn, scaleX: 0.97, scaleY: 0.97, duration: 60, ease: 'Power1' });
+        });
+        btn.on('pointerup', () => {
+            btn.setStyle({ backgroundColor: `#${colorHover.toString(16).padStart(6, '0')}` });
+            this.tweens.add({
+                targets: btn, scaleX: 1, scaleY: 1, duration: 80, ease: 'Back.Out',
+                onComplete: callback
+            });
+        });
+
+        return btn;
     }
 }

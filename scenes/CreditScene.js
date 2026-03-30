@@ -4,7 +4,7 @@ export default class CreditScene extends Phaser.Scene {
     }
 
     preload() {
-
+        this.load.image('background', 'assets/mainmenu.png');
     }
 
     create() {
