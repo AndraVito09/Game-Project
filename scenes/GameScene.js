@@ -22,11 +22,18 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create() {
-        if (!this.sound.get('bgs')) {
+        const bgm = this.sound.get('bgm');
+        if (bgm) bgm.stop();
+
+        const existing = this.sound.get('bgs');
+        if (existing) {
+            this.music = existing;
+            if (!this.music.isPlaying) {
+                this.music.play();
+            }
+        } else {
             this.music = this.sound.add('bgs', { loop: true, volume: 0.5 });
             this.music.play();
-        } else {
-            this.music = this.sound.get('bgs');
         }
         const W  = this.scale.width;
         const H  = this.scale.height;
