@@ -384,7 +384,7 @@ export default class GameScene extends Phaser.Scene {
         });
 
         // ── Tombol Reset ───────────────────────────────────────
-        const resetBtn = this.add.text(cx, H * 0.93, '[ Reset ]', {
+        const resetBtn = this.resetBtn = this.add.text(cx, H * 0.93, '[ Reset ]', {
             fontFamily: 'PixeloidSans',
             fontSize:   fs(16),
             color:      '#ffffff'
@@ -400,7 +400,7 @@ export default class GameScene extends Phaser.Scene {
         });
 
         // ── Tombol Back ────────────────────────────────────────
-        const btnBack = this.add.image(W * 0.04, H * 0.95, 'kembali')
+        const btnBack = this.btnBack = this.add.image(W * 0.04, H * 0.95, 'kembali')
             .setInteractive().setScale(0.3);
         btnBack.on('pointerdown', () => {
             if (this.music) this.music.stop();
@@ -470,6 +470,10 @@ export default class GameScene extends Phaser.Scene {
 
     checkAnswer(sentences) {
         if (this.playerWords.length !== this.correctWords.length) return;
+
+        // Disable tombol reset & back selama proses pengecekan jawaban
+        this.resetBtn.disableInteractive().setAlpha(0.35);
+        this.btnBack.disableInteractive().setAlpha(0.35);
 
         const W  = this.scale.width;
         const H  = this.scale.height;

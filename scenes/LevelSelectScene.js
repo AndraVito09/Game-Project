@@ -26,6 +26,7 @@ export default class LevelSelectScene extends Phaser.Scene {
         this.events.on('shutdown', () => {
             if (this.music) this.music.stop();
         });
+
         const W  = this.scale.width;
         const H  = this.scale.height;
         const cx = W / 2;
@@ -73,16 +74,13 @@ export default class LevelSelectScene extends Phaser.Scene {
                 .setDepth(1);
 
             if (!isUnlocked) {
-                // ── Level terkunci ──────────────────────────────
                 btn.setTint(0x555555);
                 btn.setAlpha(0.6);
 
-                // Ikon gembok
                 this.add.text(x, y - 10, '🔒', {
                     fontSize: fs(24)
                 }).setOrigin(0.5).setDepth(2);
 
-                // Tooltip saat hover
                 btn.setInteractive();
                 btn.on('pointerover', () => {
                     this._showLockTooltip(x, y - 50,
@@ -91,10 +89,8 @@ export default class LevelSelectScene extends Phaser.Scene {
                 btn.on('pointerout', () => this._hideLockTooltip());
 
             } else {
-                // ── Level terbuka ───────────────────────────────
                 btn.setInteractive();
 
-                // Badge "completed" jika sudah pernah lulus
                 if (stats.completed) {
                     this.add.text(x + 28, y - 28, '✓', {
                         fontFamily:      'PixeloidSans-Bold',
@@ -107,7 +103,6 @@ export default class LevelSelectScene extends Phaser.Scene {
 
                 btn.on('pointerover', () => {
                     btn.setScale(0.6);
-                    // Tampilkan best score jika pernah dimainkan
                     if (stats.bestScore > 0) {
                         this._showLockTooltip(x, y - 55,
                             `Best: ${stats.bestScore} skor | ${stats.bestCorrect} benar`, fs);
@@ -141,11 +136,16 @@ export default class LevelSelectScene extends Phaser.Scene {
         btnBack.on('pointerdown', () => btnBack.setTint(0xdddddd));
         btnBack.on('pointerup',   () => this.scene.start('HomeScene'));
 
+        // ── Tombol Reset Progress (kanan atas) ─────────────────
+        this._buildResetButton(W, fs);
+
+        // ── Overlay Konfirmasi Reset ───────────────────────────
+        this._buildResetOverlay(W, H, cx, fs);
+
         //tooltip untuk hint
-        this._tooltipBgHint   = this.add.rectangle(cx, H * 0.90, 1500, 100, 0x1a1a2e)
+        this._tooltipBgHint = this.add.rectangle(cx, H * 0.90, 1500, 100, 0x1a1a2e)
             .setStrokeStyle(1, 0xFFD700).setVisible(true).setDepth(0);
 
-        // Elemen tooltip (dibuat sekali, disembunyikan)
         this._tooltipBg   = this.add.rectangle(0, 0, 220, 50, 0x1a1a2e)
             .setStrokeStyle(1, 0xFFD700).setVisible(false).setDepth(10);
         this._tooltipText = this.add.text(0, 0, '', {
@@ -155,6 +155,143 @@ export default class LevelSelectScene extends Phaser.Scene {
         }).setOrigin(0.5).setVisible(false).setDepth(11);
     }
 
+    // ── Builder: tombol reset di pojok kanan atas ──────────────
+    _buildResetButton(W, fs) {
+        const btnX = W - 220;
+        const btnY = 38;
+
+        // Background tombol
+        const resetBg = this.add.rectangle(btnX, btnY, 400, 50, 0x8B0000)
+            .setStrokeStyle(2, 0xFF4444)
+            .setInteractive()
+            .setDepth(5);
+
+        // Label
+        const resetLabel = this.add.text(btnX, btnY, '⚠ RESET PROGRESS', {
+            fontFamily: 'PixeloidSans-Bold',
+            fontSize:   fs(12),
+            color:      '#FF8888',
+        }).setOrigin(0.5).setDepth(6);
+
+        // Hover & click effect
+        resetBg.on('pointerover', () => {
+            resetBg.setFillStyle(0xAA0000);
+            resetLabel.setColor('#FFCCCC');
+        });
+        resetBg.on('pointerout', () => {
+            resetBg.setFillStyle(0x8B0000);
+            resetLabel.setColor('#FF8888');
+        });
+        resetBg.on('pointerdown', () => {
+            resetBg.setFillStyle(0x550000);
+            resetBg.setScale(0.95);
+            resetLabel.setScale(0.95);
+        });
+        resetBg.on('pointerup', () => {
+            resetBg.setFillStyle(0xAA0000);
+            resetBg.setScale(1);
+            resetLabel.setScale(1);
+            this._showResetOverlay();
+        });
+    }
+
+    // ── Builder: overlay konfirmasi ────────────────────────────
+    _buildResetOverlay(W, H, cx, fs) {
+        const DEPTH = 20;
+
+        // Dim background
+        this._overlayDim = this.add.rectangle(cx, H / 2, W, H, 0x000000, 0.7)
+            .setDepth(DEPTH)
+            .setVisible(false)
+            .setInteractive(); // blokir klik ke bawah
+
+        // Panel kotak konfirmasi
+        this._overlayPanel = this.add.rectangle(cx, H / 2, 700, 300, 0x1a1a2e)
+            .setStrokeStyle(3, 0xFF4444)
+            .setDepth(DEPTH + 1)
+            .setVisible(false);
+
+        // Judul
+        this._overlayTitle = this.add.text(cx, H / 2 - 90, '⚠  RESET PROGRESS', {
+            fontFamily: 'PixeloidSans-Bold',
+            fontSize:   fs(20),
+            color:      '#FF4444',
+            stroke:     '#000000',
+            strokeThickness: 4,
+        }).setOrigin(0.5).setDepth(DEPTH + 2).setVisible(false);
+
+        // Pesan konfirmasi
+        this._overlayMsg = this.add.text(cx, H / 2 - 20,
+            'Semua progress level akan dihapus.\nApakah kamu yakin ingin mereset?', {
+            fontFamily: 'PixeloidSans',
+            fontSize:   fs(14),
+            color:      '#ffffff',
+            align:      'center',
+            lineSpacing: 8,
+        }).setOrigin(0.5).setDepth(DEPTH + 2).setVisible(false);
+
+        // ── Tombol YA ──────────────────────────────────────────
+        const yaBg = this.add.rectangle(cx - 120, H / 2 + 90, 220, 52, 0xAA0000)
+            .setStrokeStyle(2, 0xFF4444)
+            .setInteractive()
+            .setDepth(DEPTH + 2)
+            .setVisible(false);
+
+        const yaLabel = this.add.text(cx - 120, H / 2 + 90, 'YA, RESET', {
+            fontFamily: 'PixeloidSans-Bold',
+            fontSize:   fs(14),
+            color:      '#FFCCCC',
+        }).setOrigin(0.5).setDepth(DEPTH + 3).setVisible(false);
+
+        yaBg.on('pointerover', () => yaBg.setFillStyle(0xCC0000));
+        yaBg.on('pointerout',  () => yaBg.setFillStyle(0xAA0000));
+        yaBg.on('pointerdown', () => yaBg.setScale(0.95));
+        yaBg.on('pointerup',   () => {
+            yaBg.setScale(1);
+            SaveManager.reset();          // <-- panggil method reset di SaveManager
+            this._hideResetOverlay();
+            // Restart scene agar badge & lock langsung terupdate
+            this.scene.restart();
+        });
+
+        // ── Tombol BATAL ───────────────────────────────────────
+        const batalBg = this.add.rectangle(cx + 120, H / 2 + 90, 180, 52, 0x1e3a2e)
+            .setStrokeStyle(2, 0x00FF99)
+            .setInteractive()
+            .setDepth(DEPTH + 2)
+            .setVisible(false);
+
+        const batalLabel = this.add.text(cx + 120, H / 2 + 90, 'BATAL', {
+            fontFamily: 'PixeloidSans-Bold',
+            fontSize:   fs(14),
+            color:      '#00FF99',
+        }).setOrigin(0.5).setDepth(DEPTH + 3).setVisible(false);
+
+        batalBg.on('pointerover', () => batalBg.setFillStyle(0x245c3a));
+        batalBg.on('pointerout',  () => batalBg.setFillStyle(0x1e3a2e));
+        batalBg.on('pointerdown', () => batalBg.setScale(0.95));
+        batalBg.on('pointerup',   () => {
+            batalBg.setScale(1);
+            this._hideResetOverlay();
+        });
+
+        // Simpan referensi semua elemen overlay
+        this._overlayElements = [
+            this._overlayDim, this._overlayPanel,
+            this._overlayTitle, this._overlayMsg,
+            yaBg, yaLabel, batalBg, batalLabel
+        ];
+    }
+
+    _showResetOverlay() {
+        this._overlayElements.forEach(el => el.setVisible(true));
+    }
+
+    _hideResetOverlay() {
+        this._overlayElements.forEach(el => el.setVisible(false));
+    }
+
+    // ── Tooltip ────────────────────────────────────────────────
     _showLockTooltip(x, y, msg, fs) {
         const lines = msg.split('\n').length;
         const h     = 30 + lines * 20;
