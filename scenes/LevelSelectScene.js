@@ -24,23 +24,70 @@ export default class LevelSelectScene extends Phaser.Scene {
         const bgs = this.sound.get('bgs');
         if (bgs) bgs.stop();
 
-        // Pastikan bgm jalan
-        const bgm = this.sound.get('bgm');
-        if (bgm && !bgm.isPlaying) bgm.play();
-        // Tambah GIF via HTML murni
+        // ── GIF Mio ────────────────────────────────────────────────
         const gif = document.createElement('img');
         gif.src = './assets/character/mio.gif';
+        gif.id = 'mio-gif';
         gif.style.cssText = `
             position: absolute;
-            width: 180px;
-            height: 180px;
-            left: 400px;
-            top: 300px;
             pointer-events: none;
             z-index: 10;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
         `;
-        gif.id = 'mio-gif';
         document.getElementById('game-container').appendChild(gif);
+
+        // Koordinat Phaser target: bawah board, kiri tengah
+        // Board ada di sekitar x:620-1520, level row 2 di y:400
+        // Mio berdiri di bawah board → x:620, y:490
+        const MIO_GAME_X = 800;
+        const MIO_GAME_Y = 700;
+        const MIO_GAME_SIZE = 200; // ukuran dalam koordinat Phaser
+
+        const updateMioPosition = () => {
+            const gameContainer = document.getElementById('game-container');
+            const canvas = gameContainer.querySelector('canvas');
+            if (!canvas) return;
+
+            // canvas.width = resolusi internal Phaser (koordinat game)
+            const gameW = canvas.width;
+            const gameH = canvas.height;
+
+            // Ukuran tampil aktual di layar
+            const displayW = canvas.offsetWidth;
+            const displayH = canvas.offsetHeight;
+
+            // Rasio skala
+            const scaleX = displayW / gameW;
+            const scaleY = displayH / gameH;
+
+            // Offset canvas dalam container (jika ada letterbox)
+            const canvasRect = canvas.getBoundingClientRect();
+            const containerRect = gameContainer.getBoundingClientRect();
+            const offsetX = canvasRect.left - containerRect.left;
+            const offsetY = canvasRect.top - containerRect.top;
+
+            // Konversi koordinat Phaser → pixel layar
+            const gifW = MIO_GAME_SIZE * scaleX;
+            const gifH = MIO_GAME_SIZE * scaleY;
+            const left = offsetX + (MIO_GAME_X * scaleX) - gifW / 2;
+            const top  = offsetY + (MIO_GAME_Y * scaleY) - gifH;
+
+            gif.style.width  = `${gifW}px`;
+            gif.style.height = `${gifH}px`;
+            gif.style.left   = `${left}px`;
+            gif.style.top    = `${top}px`;
+        };
+
+        updateMioPosition();
+        window.addEventListener('resize', updateMioPosition);
+        gif._resizeHandler = updateMioPosition;
+
+        this.events.on('shutdown', () => {
+            window.removeEventListener('resize', gif._resizeHandler);
+            const el = document.getElementById('mio-gif');
+            if (el) el.remove();
+        });
 
         // Hapus saat scene shutdown
         this.events.on('shutdown', () => {
