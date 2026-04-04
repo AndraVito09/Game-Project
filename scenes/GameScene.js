@@ -1,4 +1,6 @@
 import { SaveManager } from '../SaveManager.js';
+import { MuteManager } from '../MuteManager.js';
+import { sceneTransitionTo, sceneFadeIn } from '../SceneTransition.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -10,6 +12,8 @@ export default class GameScene extends Phaser.Scene {
         this.load.json('sentences', 'assets/data/sentences.json');
         this.load.image('background', 'assets/gameplaybg.png');
         this.load.image('kembali', 'assets/back.png');
+        this.load.image('volumeon', 'assets/volumeon.png');
+        this.load.image('mute',     'assets/mute.png');
         this.load.audio('bgs', 'assets/sound/gssound.ogg');
     }
 
@@ -35,6 +39,11 @@ export default class GameScene extends Phaser.Scene {
             this.music = this.sound.add('bgs', { loop: true, volume: 0.5 });
             this.music.play();
         }
+
+        // Terapkan state mute & fade in
+        MuteManager.applyToScene(this);
+        sceneFadeIn(this, 400);
+
         const W  = this.scale.width;
         const H  = this.scale.height;
         const cx = W / 2;
@@ -407,14 +416,42 @@ export default class GameScene extends Phaser.Scene {
         });
 
         // ── Tombol Back ────────────────────────────────────────
-        const btnBack = this.btnBack = this.add.image(W * 0.04, H * 0.95, 'kembali')
-            .setInteractive().setScale(0.3);
-        btnBack.on('pointerdown', () => {
+        this.btnBack = this.btnBack = this.add.image(W * 0.04, H * 0.95, 'kembali')
+            .setInteractive().setScale(0.40);
+
+        this.btnBack.on('pointerover', () => this.btnBack.setScale(0.45));
+        this.btnBack.on('pointerout', () => this.btnBack.setScale(0.40));
+        this.btnBack.on('pointerdown', () => this.btnBack.setTint(0xdddddd).setScale(0.35));
+        this.btnBack.on('pointerup', () => {
             if (this.music) this.music.stop();
-            this.scene.start('LevelSelectScene')});
+            sceneTransitionTo(this, 'LevelSelectScene');
+        });
+
+        // ── Tombol Mute ────────────────────────────────────────
+        this._buildMuteButton(W, H);
 
         // Simpan fs untuk dipakai method lain
         this._fs = fs;
+    }
+
+    // ── Tombol Mute ────────────────────────────────────────────
+    _buildMuteButton(W, H) {
+        const isMuted = MuteManager.isMuted();
+        const iconKey = isMuted ? 'mute' : 'volumeon';
+
+        this.muteBtn = this.add.image(W * 0.04, H * 0.2, iconKey)
+            .setOrigin(0.5)
+            .setScale(0.45)
+            .setInteractive()
+            .setDepth(100);
+
+        this.muteBtn.on('pointerover', () => this.muteBtn.setScale(0.50));
+        this.muteBtn.on('pointerout',  () => this.muteBtn.setScale(0.45));
+        this.muteBtn.on('pointerdown', () => {
+            const nowMuted = MuteManager.toggle();
+            MuteManager.applyToScene(this);
+            this.muteBtn.setTexture(nowMuted ? 'mute' : 'volumeon');
+        });
     }
 
     // ── Snap kata ke slot ──────────────────────────────────────
@@ -681,7 +718,7 @@ export default class GameScene extends Phaser.Scene {
             cx, cy + panelH * 0.44,
             '  ☰  Pilih Level  ',
             fs(10), 0x444400, 0x888800, 0x333300, '#ffffff', D + 3,
-            () => this.scene.start('LevelSelectScene')
+            () => sceneTransitionTo(this, 'LevelSelectScene')
         );
     }
 
@@ -773,7 +810,7 @@ export default class GameScene extends Phaser.Scene {
             cx, cy + panelH * 0.45,
             '  ☰  Pilih Level  ',
             fs(7), 0x444400, 0x888800, 0x333300, '#ffffff', D + 3,
-            () => this.scene.start('LevelSelectScene')
+            () => sceneTransitionTo(this, 'LevelSelectScene')
         );
     }
 

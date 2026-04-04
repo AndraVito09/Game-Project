@@ -1,10 +1,14 @@
+import { MuteManager } from '../MuteManager.js';
+import { sceneTransitionTo } from '../SceneTransition.js';
+
 export default class CreditScene extends Phaser.Scene {
     constructor() {
         super('CreditScene');
     }
 
     preload() {
-
+        this.load.image('volumeon', 'assets/volumeon.png');
+        this.load.image('mute',     'assets/mute.png');
     }
 
     create() {
@@ -13,19 +17,19 @@ export default class CreditScene extends Phaser.Scene {
         const cx = W / 2;
         const fs = (n) => `${Math.round(n * W / 800)}px`;
 
-        // ── Background gradien gelap ───────────────────────────
-        // Layer hitam penuh, nanti di-fade in
-        const bg = this.add.rectangle(cx, H / 2, W, H, 0x000000).setAlpha(0).setDepth(0);
+        // Terapkan state mute
+        MuteManager.applyToScene(this);
 
-        // Sedikit gradien dengan rectangle overlay berwarna
+        // ── Background gradien gelap ───────────────────────────
+        const bg     = this.add.rectangle(cx, H / 2, W, H, 0x000000).setAlpha(0).setDepth(0);
         const bgGlow = this.add.rectangle(cx, H / 2, W, H, 0x0a0a1e).setAlpha(0).setDepth(1);
 
         // Bintang-bintang kecil random di background
         const starGraphics = this.add.graphics().setDepth(2).setAlpha(0);
         for (let i = 0; i < 120; i++) {
-            const sx   = Phaser.Math.Between(0, W);
-            const sy   = Phaser.Math.Between(0, H);
-            const size = Phaser.Math.FloatBetween(0.5, 2.2);
+            const sx    = Phaser.Math.Between(0, W);
+            const sy    = Phaser.Math.Between(0, H);
+            const size  = Phaser.Math.FloatBetween(0.5, 2.2);
             const alpha = Phaser.Math.FloatBetween(0.3, 1.0);
             starGraphics.fillStyle(0xffffff, alpha);
             starGraphics.fillCircle(sx, sy, size);
@@ -46,22 +50,18 @@ export default class CreditScene extends Phaser.Scene {
         });
 
         // ── Konten kredit ──────────────────────────────────────
-        // Semua teks dikumpulkan dalam container, lalu di-scroll
         const container = this.add.container(0, 0).setDepth(5);
 
-        // Fungsi helper buat teks dalam container
         const addText = (y, text, style) => {
             const t = this.add.text(cx, y, text, style).setOrigin(0.5, 0);
             container.add(t);
             return t;
         };
 
-        // ── Susun konten dari Y awal ───────────────────────────
-        let y = 0; // posisi relatif dalam container
-        const lineH = H * 0.07;   // jarak antar baris normal
-        const bigH  = H * 0.10;   // jarak setelah judul besar
+        let y = 0;
+        const lineH = H * 0.07;
+        const bigH  = H * 0.10;
 
-        // Judul utama
         addText(y, '✦ WORD ARRANGE GAME ✦', {
             fontFamily: 'PixeloidSans-Bold',
             fontSize:   fs(44),
@@ -69,7 +69,6 @@ export default class CreditScene extends Phaser.Scene {
         });
         y += bigH * 1.4;
 
-        // Versi
         addText(y, 'Version 1.0', {
             fontFamily: 'PixeloidMono',
             fontSize:   fs(16),
@@ -77,7 +76,6 @@ export default class CreditScene extends Phaser.Scene {
         });
         y += lineH * 1.8;
 
-        // ── Seksi: Developer ───────────────────────────────────
         addText(y, '— Developer —', {
             fontFamily: 'PixeloidSans-Bold',
             fontSize:   fs(22),
@@ -91,9 +89,9 @@ export default class CreditScene extends Phaser.Scene {
             ['Document', 'Kurnia Haikal'],
         ].forEach(([label, value]) => {
             addText(y, label, {
-            fontFamily: 'PixeloidSans-Bold',
-            fontSize:   fs(14),
-            color:      '#888899'
+                fontFamily: 'PixeloidSans-Bold',
+                fontSize:   fs(14),
+                color:      '#888899'
             });
             y += lineH * 0.65;
             addText(y, value, {
@@ -102,9 +100,8 @@ export default class CreditScene extends Phaser.Scene {
                 color:      '#00FF99'
             });
             y += lineH * 1.1;
-        })
+        });
 
-        // ── Seksi: Tools & Engine ──────────────────────────────
         addText(y, '— Built With —', {
             fontFamily: 'PixeloidSans-Bold',
             fontSize:   fs(22),
@@ -132,7 +129,6 @@ export default class CreditScene extends Phaser.Scene {
 
         y += lineH * 0.5;
 
-        // ── Seksi: Font Credit ─────────────────────────────────
         addText(y, '— Font ─', {
             fontFamily: 'PixeloidSans-Bold',
             fontSize:   fs(22),
@@ -154,7 +150,6 @@ export default class CreditScene extends Phaser.Scene {
         });
         y += lineH * 2.0;
 
-        // ── Seksi: Special Thanks ──────────────────────────────
         addText(y, '— Special Thanks —', {
             fontFamily: 'PixeloidSans-Bold',
             fontSize:   fs(22),
@@ -177,7 +172,6 @@ export default class CreditScene extends Phaser.Scene {
 
         y += lineH;
 
-        // ── Penutup ────────────────────────────────────────────
         addText(y, '✦  ✦  ✦', {
             fontFamily: 'PixeloidSans-Bold',
             fontSize:   fs(20),
@@ -192,15 +186,14 @@ export default class CreditScene extends Phaser.Scene {
         });
         y += lineH * 2.5;
 
-        // ── Posisi awal container: teks mulai dari bawah layar ─
-        const totalContentH = y;                   // total tinggi konten
-        const startY        = H;                    // mulai tepat di bawah layar
-        const endY          = -totalContentH;       // berakhir saat konten habis melewati atas
+        // ── Posisi awal container ──────────────────────────────
+        const totalContentH  = y;
+        const startY         = H;
+        const endY           = -totalContentH;
 
         container.setY(startY);
 
-        // ── Delay sedikit setelah bg fade selesai, baru scroll ─
-        const scrollDuration = Math.max(totalContentH * 12, 12000); // ~12px per detik
+        const scrollDuration = Math.max(totalContentH * 12, 12000);
 
         this.time.delayedCall(1000, () => {
             this.tweens.add({
@@ -209,19 +202,12 @@ export default class CreditScene extends Phaser.Scene {
                 duration: scrollDuration,
                 ease:     'Linear',
                 onComplete: () => {
-                    // Setelah selesai scroll → fade out lalu kembali ke Home
-                    this.tweens.add({
-                        targets:  this.cameras.main,
-                        alpha:    0,
-                        duration: 1000,
-                        ease:     'Power2',
-                        onComplete: () => this.scene.start('HomeScene')
-                    });
+                    sceneTransitionTo(this, 'HomeScene');
                 }
             });
         });
 
-        // ── Tombol Skip (muncul setelah 1 detik) ──────────────
+        // ── Tombol Skip ────────────────────────────────────────
         const skipBtn = this.add.text(W - 30, 30, '[ Skip ]', {
             fontFamily:      'PixeloidSans',
             fontSize:        fs(16),
@@ -238,17 +224,36 @@ export default class CreditScene extends Phaser.Scene {
         skipBtn.on('pointerout',  () => skipBtn.setStyle({ color: '#666677', backgroundColor: '#111122' }));
         skipBtn.on('pointerdown', () => {
             this.tweens.killAll();
-            this.cameras.main.fade(600, 0, 0, 0, false, (cam, progress) => {
-                if (progress === 1) this.scene.start('HomeScene');
-            });
+            sceneTransitionTo(this, 'HomeScene');
         });
 
-        // ── Garis top & bottom agar teks tidak terlihat di luar area ─
-        // Mask area: teks hanya terlihat di dalam layar (bukan di luar atas/bawah)
+        // ── Tombol Mute ────────────────────────────────────────
+        this._buildMuteButton(W);
+
+        // ── Mask agar teks tidak terlihat di luar layar ────────
         const maskShape = this.make.graphics();
         maskShape.fillStyle(0xffffff);
         maskShape.fillRect(0, 0, W, H);
         const mask = maskShape.createGeometryMask();
         container.setMask(mask);
+    }
+
+    _buildMuteButton(W) {
+        const isMuted = MuteManager.isMuted();
+        const iconKey = isMuted ? 'mute' : 'volumeon';
+
+        this.muteBtn = this.add.image(80, 80, iconKey)
+            .setOrigin(0.5)
+            .setScale(0.45)
+            .setInteractive()
+            .setDepth(100);
+
+        this.muteBtn.on('pointerover', () => this.muteBtn.setScale(0.50));
+        this.muteBtn.on('pointerout',  () => this.muteBtn.setScale(0.45));
+        this.muteBtn.on('pointerdown', () => {
+            const nowMuted = MuteManager.toggle();
+            MuteManager.applyToScene(this);
+            this.muteBtn.setTexture(nowMuted ? 'mute' : 'volumeon');
+        });
     }
 }

@@ -1,4 +1,6 @@
 import { SaveManager } from '../SaveManager.js';
+import { MuteManager } from '../MuteManager.js';
+import { sceneTransitionTo, sceneFadeIn } from '../SceneTransition.js';
 
 export default class LevelSelectScene extends Phaser.Scene {
     constructor() {
@@ -7,6 +9,8 @@ export default class LevelSelectScene extends Phaser.Scene {
 
     preload() {
         this.load.image('bglevel',  'assets/levelselection.png');
+        this.load.image('volumeon', 'assets/volumeon.png');
+        this.load.image('mute',     'assets/mute.png');
         this.load.image('level1',   'assets/Level 1.png');
         this.load.image('level2',   'assets/Level 2.png');
         this.load.image('level3',   'assets/Level 3.png');
@@ -95,6 +99,12 @@ export default class LevelSelectScene extends Phaser.Scene {
             if (el) el.remove();
         });
         this.music = this.sound.get('bgm');
+
+        // Terapkan state mute
+        MuteManager.applyToScene(this);
+
+        // Fade in saat scene dibuka
+        sceneFadeIn(this, 400);
 
         this.events.on('shutdown', () => {
             if (this.music) this.music.stop();
@@ -193,7 +203,7 @@ export default class LevelSelectScene extends Phaser.Scene {
                 btn.on('pointerup', () => {
                     btn.setScale(0.5);
                     btn.clearTint();
-                    this.scene.start('GameScene', {
+                    sceneTransitionTo(this, 'GameScene', {
                         level:         String(level),
                         questionIndex: 0,
                         score:         0,
@@ -204,10 +214,15 @@ export default class LevelSelectScene extends Phaser.Scene {
             }
         });
 
-        // ── Tombol Back ────────────────────────────────────────
-        const btnBack = this.add.image(100, 100, 'kembali').setScale(0.3).setInteractive();
-        btnBack.on('pointerdown', () => btnBack.setTint(0xdddddd));
-        btnBack.on('pointerup',   () => this.scene.start('HomeScene'));
+        this.btnBack = this.add.image(100, 100, 'kembali').setScale(0.40).setInteractive();
+
+        this.btnBack.on('pointerover', () => this.btnBack.setScale(0.45))
+        this.btnBack.on('pointerout', () => this.btnBack.setScale(0.40))
+        this.btnBack.on('pointerdown', () => this.btnBack.setTint(0xdddddd).setScale(0.35));
+        this.btnBack.on('pointerup',   () => sceneTransitionTo(this, 'HomeScene'));
+
+        // ── Tombol Mute ────────────────────────────────────────
+        this._buildMuteButton();
 
         // ── Tombol Reset Progress (kanan atas) ─────────────────
         this._buildResetButton(W, fs);
@@ -226,6 +241,25 @@ export default class LevelSelectScene extends Phaser.Scene {
             color:      '#ffcc44',
             align:      'center'
         }).setOrigin(0.5).setVisible(false).setDepth(11);
+    }
+
+    _buildMuteButton() {
+        const isMuted = MuteManager.isMuted();
+        const iconKey = isMuted ? 'mute' : 'volumeon';
+
+        this.muteBtn = this.add.image(250, 100, iconKey)
+            .setOrigin(0.5)
+            .setScale(0.45)
+            .setInteractive()
+            .setDepth(100);
+
+        this.muteBtn.on('pointerover', () => this.muteBtn.setScale(0.50));
+        this.muteBtn.on('pointerout',  () => this.muteBtn.setScale(0.45));
+        this.muteBtn.on('pointerdown', () => {
+            const nowMuted = MuteManager.toggle();
+            MuteManager.applyToScene(this);
+            this.muteBtn.setTexture(nowMuted ? 'mute' : 'volumeon');
+        });
     }
 
     // ── Builder: tombol reset di pojok kanan atas ──────────────
