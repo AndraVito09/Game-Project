@@ -22,11 +22,22 @@ export default class LevelSelectScene extends Phaser.Scene {
         this.load.image('level9',   'assets/Level 9.png');
         this.load.image('level10',  'assets/Level 10.png');
         this.load.image('kembali',  'assets/back.png');
+        this.load.audio('bgm',      'assets/sound/bgsound.ogg');
     }
 
     create() {
         const bgs = this.sound.get('bgs');
         if (bgs) bgs.stop();
+
+        // ── Musik bgm: play ulang jika belum jalan ─────────────
+        const existingBgm = this.sound.get('bgm');
+        if (existingBgm) {
+            this.music = existingBgm;
+            if (!this.music.isPlaying) this.music.play();
+        } else {
+            this.music = this.sound.add('bgm', { loop: true, volume: 0.5 });
+            this.music.play();
+        }
 
         // ── GIF Mio ────────────────────────────────────────────────
         const gif = document.createElement('img');
@@ -38,6 +49,8 @@ export default class LevelSelectScene extends Phaser.Scene {
             z-index: 10;
             image-rendering: pixelated;
             image-rendering: crisp-edges;
+            opacity: 1;
+            transition: none;
         `;
         document.getElementById('game-container').appendChild(gif);
 
@@ -98,7 +111,6 @@ export default class LevelSelectScene extends Phaser.Scene {
             const el = document.getElementById('mio-gif');
             if (el) el.remove();
         });
-        this.music = this.sound.get('bgm');
 
         // Terapkan state mute
         MuteManager.applyToScene(this);

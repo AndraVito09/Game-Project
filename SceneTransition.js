@@ -26,6 +26,12 @@ export function sceneTransitionTo(scene, targetScene, data = {}, duration = 400)
         0x000000
     ).setAlpha(0).setDepth(9999);
 
+    const mioEl = document.getElementById('mio-gif');
+    if (mioEl) {
+        mioEl.style.transition = `opacity ${duration}ms ease`;
+        mioEl.style.opacity = '0';
+    }
+
     scene.tweens.add({
         targets:  overlay,
         alpha:    1,
